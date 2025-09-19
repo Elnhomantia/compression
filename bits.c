@@ -1,4 +1,6 @@
+#include "bit.h"
 #include "bitstream.h"
+#include <stdio.h>
 #include "bits.h"
 
 /*
@@ -10,10 +12,7 @@
 
 void put_bits(struct bitstream *b, unsigned int nb, unsigned long v)
 {
-
-
-
-
+ 
 }
 
 

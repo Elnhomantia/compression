@@ -4,3 +4,7 @@
 !*.*
 
 *.o
+
+.cache
+.vscode
+build/
