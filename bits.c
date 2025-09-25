@@ -1,7 +1,7 @@
+#include "bits.h"
 #include "bit.h"
 #include "bitstream.h"
 #include <stdio.h>
-#include "bits.h"
 
 /*
  * Oon écrit les "nb" bits de droite de "v"
@@ -10,11 +10,13 @@
  * Pour v=11 nb=8 on va écrire les bits : 00001011 dans le fichier
  */
 
-void put_bits(struct bitstream *b, unsigned int nb, unsigned long v)
-{
- 
-}
+void put_bits(struct bitstream *b, unsigned int nb, unsigned long v) {
 
+  for (unsigned int i = 1; i <= nb; i++) {
+    unsigned char id = nb - i;
+    put_bit(b, prend_bit(v, id));
+  }
+}
 
 /*
  * Lecture de "nb" bits venant du fichier.
@@ -24,15 +26,13 @@ void put_bits(struct bitstream *b, unsigned int nb, unsigned long v)
  * 00->0 01->1 10->2 11->3
  */
 
-unsigned int get_bits(struct bitstream *b, unsigned int nb)
-{
-
-
-
-
-
-
-return 0 ; /* pour enlever un warning du compilateur */
+unsigned int get_bits(struct bitstream *b, unsigned int nb) {
+  unsigned int result = 0;
+    for(unsigned int i = 0; i < nb; i++){
+        Booleen val = get_bit(b);
+        result = pose_bit(result, nb-i -1, val);
+    }
+  return result; /* pour enlever un warning du compilateur */
 }
 
 /*
@@ -43,8 +43,11 @@ return 0 ; /* pour enlever un warning du compilateur */
  * Comme d'habitude le caractère '0' c'est Faux les autres sont vrai
  */
 
-void put_bit_string(struct bitstream *b, const char *bits)
-{
-
-
+void put_bit_string(struct bitstream *b, const char *bits) {
+  unsigned int counter;
+  while (bits[counter] != '\0') {
+   
+    put_bit(b, (bits[counter] == '0') ?  Faux : Vrai);
+    counter++;
+  }
 }
