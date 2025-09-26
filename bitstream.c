@@ -94,7 +94,6 @@ void flush_bitstream(struct bitstream *b) {
   if (!b->ecriture || b->nb_bits_dans_buffer == 0) {
     return;
   }
-  // b->buffer <<=8 - b->nb_bits_dans_buffer;
   int returnCode = fwrite(&b->buffer, sizeof(unsigned char), 1, b->fichier);
   // printf("%d\n",returnCode);
 
@@ -118,10 +117,10 @@ void close_bitstream(struct bitstream *b) {
     flush_bitstream(b);
   int code = fclose(b->fichier);
 
-  free(b);
   if (code == EOF) {
     EXCEPTION_LANCE(Exception_fichier_fermeture);
   }
+  free(b);
 }
 
 /*
@@ -197,7 +196,7 @@ Booleen get_bit(struct bitstream *b) {
   // printf("%d", b->buffer);
   
 
-  return prend_bit(b->buffer, (--b->nb_bits_dans_buffer)); /* pour enlever un warning du compilateur */
+  return prend_bit(b->buffer, (--b->nb_bits_dans_buffer));
 }
 
 /*

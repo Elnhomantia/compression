@@ -13,8 +13,7 @@
 void put_bits(struct bitstream *b, unsigned int nb, unsigned long v) {
 
   for (unsigned int i = 1; i <= nb; i++) {
-    unsigned char id = nb - i;
-    put_bit(b, prend_bit(v, id));
+    put_bit(b, prend_bit(v, nb - i));
   }
 }
 
@@ -30,7 +29,7 @@ unsigned int get_bits(struct bitstream *b, unsigned int nb) {
   unsigned int result = 0;
     for(unsigned int i = 0; i < nb; i++){
         Booleen val = get_bit(b);
-        result = pose_bit(result, nb-i -1, val);
+        result = pose_bit(result, nb - i - 1, val);
     }
   return result; /* pour enlever un warning du compilateur */
 }
