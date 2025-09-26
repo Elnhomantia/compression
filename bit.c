@@ -80,11 +80,10 @@ unsigned long pose_bit(unsigned long c,	      /* Entier à modifier */
 
 	if(bit)
 	{
-		c = c | pow2(position);
+		return (c | pow2(position));
 	}
 	else
 	{
-		c = c & ~pow2(position);
+		return (c & ~pow2(position));
 	}
-	return c;
 }
