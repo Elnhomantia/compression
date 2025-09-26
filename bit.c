@@ -63,7 +63,7 @@ Booleen prend_bit(unsigned long c,	     /* L'entier où on prend le bit */
 		  Position_Bit position	     /* La position du bit pris */
 		  )
 {
-	return (c & pow2(position)) != 0; //pb conversion
+	return (c & pow2(position)) != 0;
 }
 
 /*

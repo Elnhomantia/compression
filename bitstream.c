@@ -149,13 +149,12 @@ void close_bitstream(struct bitstream *b) {
 
 void put_bit(struct bitstream *b, Booleen bit) {
   if (!b->ecriture) {
-    free(b);
+    //free(b); core dump ???
     EXCEPTION_LANCE(Exception_fichier_ecriture_dans_fichier_ouvert_en_lecture);
   }
   unsigned long bufSize = sizeof(b->buffer) * 8;
   if (b->nb_bits_dans_buffer >= bufSize) {
     flush_bitstream(b);
-    b->nb_bits_dans_buffer = 0;
   }
   // printf("%d\n", ((bufSize - 1) - b->nb_bits_dans_buffer) - (7 - b->nb_bits_dans_buffer ));
   b->buffer = pose_bit(b->buffer, ((bufSize - 1) - b->nb_bits_dans_buffer), bit);
@@ -187,15 +186,18 @@ void put_bit(struct bitstream *b, Booleen bit) {
 
 Booleen get_bit(struct bitstream *b) {
   if (b->ecriture) {
+    free(b);
     EXCEPTION_LANCE(Exception_fichier_lecture_dans_fichier_ouvert_en_ecriture);
   }
 
+  unsigned int bufSize = sizeof(b->buffer);
   if (b->nb_bits_dans_buffer == 0) {
-    int returnCode = fread(&b->buffer, sizeof(unsigned char), 1, b->fichier);
+    int returnCode = fread(&b->buffer, bufSize, 1, b->fichier);
     if (returnCode != 1) {
+      free(b);
       EXCEPTION_LANCE(Exception_fichier_lecture);
     }
-    b->nb_bits_dans_buffer = 8;
+    b->nb_bits_dans_buffer = bufSize * 8;
   }
   // printf("%d", b->buffer);
   
