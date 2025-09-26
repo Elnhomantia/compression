@@ -1,0 +1,340 @@
+
+bases.h,175
+#define BASES_H2,16
+#define ICI 14,225
+#define EXIT 18,311
+#define ALLOUER(25,477
+#define TAILLE(32,747
+#define CONCATENE(36,851
+#define ABS(40,895
+#define MAX(44,954
+
+bit.c,122
+unsigned int nb_bits_utile(16,521
+unsigned long pow2(50,1412
+Booleen prend_bit(67,1747
+unsigned long pose_bit(80,2140
+
+bit.h,226
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_BIT_H6,133
+typedef enum { Faux=11,229
+typedef enum { Faux=0, Vrai=11,229
+typedef enum { Faux=0, Vrai=1 } Booleen 11,229
+typedef unsigned char Position_Bit 16,400
+
+bit_tst.c,105
+void nb_bits_utile_tst(4,37
+void pow2_tst(24,491
+void prend_bit_tst(44,917
+void pose_bit_tst(71,1465
+
+bits.c,81
+void put_bits(11,221
+unsigned int get_bits(28,651
+void put_bit_string(46,1091
+
+bits.h,72
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_BITS_H6,134
+
+bits_tst.c,100
+#define N 6,84
+void put_bits_tst(8,100
+void get_bits_tst(46,718
+void put_bit_string_tst(88,1439
+
+bitstream.c,484
+struct bitstream27,941
+  FILE          *fichier fichier29,961
+  Buffer_Bit     buffer 30,1023
+  Position_Bit   nb_bits_dans_buffer 31,1082
+  Booleen        ecriture 32,1155
+struct bitstream *open_bitstream(open_bitstream57,2101
+void flush_bitstream(99,3085
+void close_bitstream(121,3686
+void put_bit(150,4450
+Booleen get_bit(183,5560
+FILE *bitstream_get_file(bitstream_get_file206,6199
+Booleen bitstream_en_ecriture(210,6282
+int bitstream_nb_bits_dans_buffer(214,6371
+
+bitstream.h,142
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_BITSTREAM_H6,139
+typedef unsigned char Buffer_Bit 16,406
+#define NB_BITS 20,480
+
+bitstream_tst.c,186
+void open_bitstream_tst(11,176
+int premier_caractere(151,3927
+int deuxieme_caractere(162,4049
+void close_bitstream_tst(174,4185
+void put_bit_tst(205,4881
+void get_bit_tst(299,7162
+
+dct.c,39
+void coef_dct(20,504
+void dct(39,942
+
+dct.h,19
+#define DCT_H2,14
+
+dct_tst.c,102
+#define NBE 5,58
+void coef_dct_tst(7,73
+#define BIG 44,946
+#define F(45,962
+void dct_tst(47,1014
+
+entier.c,161
+static char *prefixes[prefixes38,1463
+void put_entier(42,1644
+unsigned int get_entier(66,2178
+void put_entier_signe(116,3376
+int get_entier_signe(132,3587
+
+entier.h,74
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_ENTIER_H6,136
+
+entier_tst.c,189
+    int entier 6,56
+  char *chaine chaine7,73
+} t[t8,90
+void put_entier_tst(39,973
+void get_entier_tst(65,1535
+void put_entier_signe_tst(87,1925
+void get_entier_signe_tst(154,3281
+
+eprintf.c,74
+static int  premiere 4,40
+int eprintf(6,68
+int eprintf_utilisee(23,359
+
+exception.h,672
+#define EXCEPTION_H6,88
+extern volatile struct exception_c12,169
+  int profondeur 14,206
+  int profondeur_max 15,225
+  jmp_buf *buf buf16,248
+  int valeur_de_retour 17,265
+} global_exception 18,290
+#define EXCEPTION_DECLARATION 24,385
+#define EXCEPTION_LANCE(34,691
+#define EXCEPTION(50,1238
+  Exception_fichier_ouverture 84,2529
+  Exception_fichier_ecriture,85,2564
+  Exception_fichier_lecture,86,2594
+  Exception_fichier_fermeture,87,2623
+  Exception_fichier_ecriture_dans_fichier_ouvert_en_lecture,88,2654
+  Exception_fichier_lecture_dans_fichier_ouvert_en_ecriture,89,2715
+  Exception_arbre_shannon_fano_invalide,90,2776
+  Exception_derniere92,2818
+
+filtres.c,850
+#define LARG 15,259
+struct parametres17,301
+  char *nom nom19,321
+  void (*fct)fct20,335
+  int lit_flottant 22,374
+  int nbe 23,395
+  int position 24,407
+  float qualite 25,424
+  int shannon 26,442
+  int saute_entete 27,458
+void fread_safe(30,484
+#define fwrite(35,591
+void affiche_son(37,647
+void filtre_prediction(82,1676
+void filtre_dct(119,2271
+void saute_entete(141,2763
+void filtre_rle(152,2968
+void filtre_rleinv(188,3831
+void filtre_psycho(234,4753
+void filtre_imagedct(248,5073
+void filtre_shannon_fano_8(258,5348
+void filtre_shannon_fano_16(278,5700
+void filtre_imagedctinv(301,6114
+void filtre_dctinv(313,6444
+void filtre_quantif(334,6933
+void filtre_zigzag(360,7671
+void filtre_zigzaginv(391,8446
+void filtre_ondelette(422,9222
+void filtre_ondeletteinv(427,9311
+#define ARG(432,9393
+void filtres(434,9443
+
+image.c,160
+void lire_ligne(10,198
+struct image* allocation_image(24,375
+void liberation_image(42,728
+struct image* lecture_image(58,1073
+void ecriture_image(104,2187
+
+image.h,202
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_IMAGE_H6,135
+struct image10,223
+  int largeur 12,238
+  int hauteur 13,254
+  unsigned char **pixels pixels14,270
+#define MAXLIGNE 17,302
+
+image_tst.c,160
+void lire_ligne_tst(3,20
+void allocation_image_tst(43,616
+void liberation_image_tst(58,872
+void lecture_image_tst(73,1176
+void ecriture_image_tst(100,1777
+
+intstream.c,296
+struct intstream5,60
+  enum intstream_type type 7,79
+  struct bitstream *bitstream bitstream8,108
+  struct shannon_fano *shannon_fano shannon_fano9,188
+struct intstream* open_intstream(13,263
+void close_intstream(33,639
+void put_entier_intstream(38,700
+int get_entier_intstream(56,1102
+
+intstream.h,167
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_INTSTREAM_H6,139
+enum intstream_type19,475
+{  Entier20,495
+  ,Entier_Signe21,505
+  ,Shannon_fano22,521
+
+jpg.c,212
+void dct_image(14,388
+void quantification(45,1171
+void zigzag(79,2171
+static void extrait_matrice(106,2751
+static void insert_matrice(126,3176
+void compresse_image(154,3758
+void decompresse_image(179,4353
+
+jpg.h,71
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_JPG_H6,133
+
+jpg_tst.c,103
+void dct_image_tst(5,58
+void quantification_tst(45,1117
+void zigzag_tst(83,2046
+#define ZZ(85,2066
+
+matrice.c,371
+Matrice * allocation_matrice_float(10,164
+void liberation_matrice_float(28,481
+void produit_matrices_float(44,734
+void produit_matrice_vecteur(71,1323
+void transposition_matrice_partielle(91,1699
+void transposition_matrice(103,1996
+void affiche_matrice(112,2157
+struct image* creation_image_a_partir_de_matrice_float(128,2470
+void affiche_matrice_image(155,3143
+
+matrice.h,163
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_MATRICE_H6,137
+  int width,11,244
+  int width, height 11,244
+  float **t t12,266
+} Matrice 13,280
+
+matrice_tst.c,82
+void allocation_matrice_float_tst(4,41
+void liberation_matrice_float_tst(25,401
+
+ondelette.c,335
+void ondelette_1d(24,619
+void ondelette_2d(87,2535
+void quantif_ondelette(128,3662
+void codage_ondelette(155,4375
+void ondelette_1d_inverse(208,5587
+void ondelette_2d_inverse(222,5886
+void dequantif_ondelette(262,6904
+void decodage_ondelette(280,7390
+void ondelette_encode_image(334,8692
+void ondelette_decode_image(364,9649
+
+ondelette.h,77
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_ONDELETTE_H6,139
+
+ondelette_tst.c,364
+#define NBM 6,87
+    int nb 10,123
+    float in[in11,136
+    float out[out12,156
+  } t1[t113,177
+void ondelette_1d_tst(23,508
+void ondelette_1d_inverse_tst(50,1047
+    int hau,77,1628
+    int hau, lar 77,1628
+    float in[in78,1647
+    float out[out79,1672
+  } t2[t280,1698
+void ondelette_2d_tst(149,3031
+void ondelette_2d_inverse_tst(233,4766
+
+psycho.c,20
+void psycho(29,775
+
+psycho.h,74
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_PSYCHO_H6,136
+
+psycho_tst.c,22
+void psycho_tst(4,40
+
+rle.c,50
+void compresse(44,1424
+void decompresse(82,2187
+
+rle.h,71
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_RLE_H6,133
+
+rle_tst.c,84
+void compresse_test(6,83
+void compresse_tst(51,1217
+void decompresse_tst(65,1565
+
+sf.c,651
+#define VALEUR_ESCAPE 13,379
+struct evenement15,445
+  int valeur 17,465
+  int nb_occurrences 18,480
+struct shannon_fano21,509
+  int nb_evenements 23,532
+  struct evenement evenements[evenements24,554
+struct shannon_fano* open_shannon_fano(31,761
+void close_shannon_fano(47,1026
+static int trouve_position(59,1331
+static int trouve_separation(85,2066
+static void encode_position(108,2608
+static void incremente_et_ordonne(141,3401
+void put_entier_shannon_fano(168,4151
+static int decode_position(189,4755
+int get_entier_shannon_fano(217,5387
+int sf_get_nb_evenements(241,6038
+void sf_get_evenement(245,6124
+int sf_table_ok(250,6298
+
+sf.h,70
+#define _HOME_EXCO_REDACTEX_COURS_TRANS_COMP_IMAGE_TP_DCT2_SF_H6,132
+
+sf_tst.c,245
+void open_shannon_fano_tst(6,76
+void close_shannon_fano_tst(38,753
+void put_entier_shannon_fano_tst(54,1031
+static int simple(227,4518
+static int aleatoire(232,4562
+static int aleatoire2(238,4636
+void get_entier_shannon_fano_tst(245,4723
+
+tests.c,63
+EXCEPTION_DECLARATION 7,104
+#define F(9,129
+int main(11,299
+
+tests.h,133
+struct { char *nom nom3,26
+struct { char *nom ; void (*test)test3,26
+struct { char *nom ; void (*test)() ; } global[global3,26
+
+tests_table.h,0
+
+tests_proto.h,0
