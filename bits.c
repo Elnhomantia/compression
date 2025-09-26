@@ -31,7 +31,7 @@ unsigned int get_bits(struct bitstream *b, unsigned int nb) {
         Booleen val = get_bit(b);
         result = pose_bit(result, nb - i - 1, val);
     }
-  return result; /* pour enlever un warning du compilateur */
+  return result;
 }
 
 /*

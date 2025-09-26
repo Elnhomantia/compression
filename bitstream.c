@@ -56,10 +56,12 @@ struct bitstream {
  */
 
 struct bitstream *open_bitstream(const char *fichier, const char *mode) {
-  struct bitstream *bst = malloc(sizeof(struct bitstream));
-  if (!strcmp(fichier, "-")) // are equal
+  struct bitstream *bst = NULL;
+  ALLOUER(bst, 1);
+  Booleen isRead = (mode[0] == 'r') != 0;
+  if (strcmp(fichier, "-") == 0) // are equal
   {
-    if (mode[0] == 'r') {
+    if (isRead) {
       bst->fichier = stdin;
     } else {
       bst->fichier = stdout;
@@ -67,10 +69,13 @@ struct bitstream *open_bitstream(const char *fichier, const char *mode) {
   } else {
     bst->fichier = fopen(fichier, mode);
   }
-  bst->ecriture = mode[0] == 'r' ? Faux : Vrai;
+  bst->ecriture = !isRead;
   bst->nb_bits_dans_buffer = 0;
   if (bst->fichier == NULL)
+  {
+    free(bst);
     EXCEPTION_LANCE(Exception_fichier_ouverture);
+  }
   return bst;
 }
 
@@ -98,6 +103,7 @@ void flush_bitstream(struct bitstream *b) {
   // printf("%d\n",returnCode);
 
   if (returnCode < 1) {
+    free(b);
     EXCEPTION_LANCE(Exception_fichier_ecriture);
   }
   b->nb_bits_dans_buffer = 0;
@@ -118,6 +124,7 @@ void close_bitstream(struct bitstream *b) {
   int code = fclose(b->fichier);
 
   if (code == EOF) {
+    free(b);
     EXCEPTION_LANCE(Exception_fichier_fermeture);
   }
   free(b);
@@ -142,19 +149,16 @@ void close_bitstream(struct bitstream *b) {
 
 void put_bit(struct bitstream *b, Booleen bit) {
   if (!b->ecriture) {
+    free(b);
     EXCEPTION_LANCE(Exception_fichier_ecriture_dans_fichier_ouvert_en_lecture);
   }
-  if (b->nb_bits_dans_buffer >= sizeof(b->buffer) * 8) {
+  unsigned long bufSize = sizeof(b->buffer) * 8;
+  if (b->nb_bits_dans_buffer >= bufSize) {
     flush_bitstream(b);
     b->nb_bits_dans_buffer = 0;
   }
-  // printf("======================\n");
-  // printf("%d\n", b->buffer);
-  // printf("%lu\n", (sizeof(b->buffer) * 8 - b->nb_bits_dans_buffer));
-
-  b->buffer = pose_bit(b->buffer, (7 - b->nb_bits_dans_buffer), bit);
-  // printf("%d\n", b->buffer);
-  // printf("======================\n");
+  // printf("%d\n", ((bufSize - 1) - b->nb_bits_dans_buffer) - (7 - b->nb_bits_dans_buffer ));
+  b->buffer = pose_bit(b->buffer, ((bufSize - 1) - b->nb_bits_dans_buffer), bit);
   b->nb_bits_dans_buffer++;
 }
 
