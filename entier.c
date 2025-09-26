@@ -1,5 +1,7 @@
-#include "bits.h"
 #include "entier.h"
+#include "bases.h"
+#include "bit.h"
+#include "bits.h"
 
 /*
  * Les fonctions de ce fichier permette d'encoder et de décoder
@@ -12,7 +14,7 @@
  *
  * Le nombre est codé par la concaténation du PREFIXE et SUFFIXE
  * Le suffixe est en fait le nombre entier sauf le premier bit a 1
- * 
+ *
  * Nombre de bits |    PRÉFIXE     | nombres codés | SUFFIXE
  *       0        |       00       |      0        |
  *     	 1        |       010      |  1 (pas 0)    |
@@ -35,23 +37,20 @@
  *
  */
 
-static char *prefixes[] = { "00", "010", "011", "1000", "1001", "1010", "1011",
-			    "11000", "11001", "11010", "11011", "11100",
-			    "11101", "11110", "111110", "111111" } ;
+static char *prefixes[] = {
+    "00",    "010",   "011",   "1000",  "1001",  "1010",  "1011",   "11000",
+    "11001", "11010", "11011", "11100", "11101", "11110", "111110", "111111"};
 
-void put_entier(struct bitstream *b, unsigned int f)
-{
+void put_entier(struct bitstream *b, unsigned int f) {
+  if (f > 32767) {
+    EXIT;
+  }
+  unsigned int nb_bits = nb_bits_utile(f);
+  const char *prefixe = prefixes[nb_bits];
 
-
-
-
-
-
-
-
-
-
-
+  put_bit_string(b, prefixe);
+  if (nb_bits > 1)
+    put_bits(b, nb_bits - 1, f);
 }
 
 /*
@@ -63,40 +62,9 @@ void put_entier(struct bitstream *b, unsigned int f)
  * Mais je ne vous le demande pas
  */
 
-unsigned int get_entier(struct bitstream *b)
-{
+unsigned int get_entier(struct bitstream *b) {
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-return 0 ; /* pour enlever un warning du compilateur */
+  return 0; /* pour enlever un warning du compilateur */
 }
 
 /*
@@ -114,27 +82,11 @@ return 0 ; /* pour enlever un warning du compilateur */
  *
  */
 
-void put_entier_signe(struct bitstream *b, int i)
-{
-
-
-
-
-
-
-
-
-
-
-}
+void put_entier_signe(struct bitstream *b, int i) {}
 /*
  *
  */
-int get_entier_signe(struct bitstream *b)
-{
+int get_entier_signe(struct bitstream *b) {
 
-
-
-
-return 0 ; /* pour enlever un warning du compilateur */
+  return 0; /* pour enlever un warning du compilateur */
 }
