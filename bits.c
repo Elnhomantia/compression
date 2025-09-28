@@ -46,7 +46,7 @@ void put_bit_string(struct bitstream *b, const char *bits) {
   unsigned int counter;
   while (bits[counter] != '\0') {
    
-    put_bit(b, (bits[counter] == '0') ?  Faux : Vrai);
+    put_bit(b, !(bits[counter] == '0'));
     counter++;
   }
 }

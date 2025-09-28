@@ -47,7 +47,7 @@ unsigned int nb_bits_utile(unsigned long v)
 unsigned long pow2(Position_Bit position)
 {
 	unsigned long res = 1;
-	return res << position;
+	return (position < sizeof(unsigned long)*8) ? res << position : 0;
 }
 
 /*

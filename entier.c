@@ -2,6 +2,8 @@
 #include "bases.h"
 #include "bit.h"
 #include "bits.h"
+#include "bitstream.h"
+#include <stdio.h>
 
 /*
  * Les fonctions de ce fichier permette d'encoder et de décoder
@@ -63,8 +65,40 @@ void put_entier(struct bitstream *b, unsigned int f) {
  */
 
 unsigned int get_entier(struct bitstream *b) {
+  char prefix_buf[8] = {0};
+  int len = 0;
+  Booleen prefix_not_found = 1;
+  unsigned int nb_bits;
 
-  return 0; /* pour enlever un warning du compilateur */
+  prefix_buf[len++] = get_bit(b) ? '1' : '0';
+
+  while (prefix_not_found) {
+    prefix_buf[len++] = get_bit(b) ? '1' : '0';
+    prefix_buf[len] = '\0';
+    for (int i = 0; i < TAILLE(prefixes); i++) {
+      if (strcmp(prefix_buf, prefixes[i]) == 0) {
+        nb_bits = i;
+        prefix_not_found = Faux;
+      }
+    }
+    if (len >= 7 && prefix_not_found) {
+      printf("%s", prefix_buf); 
+    }
+  }
+
+  if (nb_bits == 0) {
+    return 0;
+  }
+
+  unsigned int suffixe = 0;
+  if (nb_bits > 1) {
+    suffixe = get_bits(b, nb_bits - 1);
+  }
+  unsigned int entier = pow2(nb_bits - 1);
+
+  entier = entier | suffixe;
+
+  return entier; /* pour enlever un warning du compilateur */
 }
 
 /*
@@ -82,11 +116,18 @@ unsigned int get_entier(struct bitstream *b) {
  *
  */
 
-void put_entier_signe(struct bitstream *b, int i) {}
+void put_entier_signe(struct bitstream *b, int i) {
+  Booleen inf_a_zero = (i < 0);
+  put_bit(b, inf_a_zero);
+  put_entier(b, ABS(i) - ((inf_a_zero) ? 1 : 0));
+  
+}
 /*
  *
  */
 int get_entier_signe(struct bitstream *b) {
-
-  return 0; /* pour enlever un warning du compilateur */
+  Booleen negatif = get_bit(b);
+  int nb = get_entier(b);
+   
+  return (!negatif) ? nb : -nb - 1 ; /* pour enlever un warning du compilateur */
 }

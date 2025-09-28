@@ -122,12 +122,12 @@ void close_bitstream(struct bitstream *b) {
   if (b->ecriture)
     flush_bitstream(b);
   int code = fclose(b->fichier);
-
+  free(b);
   if (code == EOF) {
-    free(b);
+    
     EXCEPTION_LANCE(Exception_fichier_fermeture);
   }
-  free(b);
+ 
 }
 
 /*
@@ -186,7 +186,7 @@ void put_bit(struct bitstream *b, Booleen bit) {
 
 Booleen get_bit(struct bitstream *b) {
   if (b->ecriture) {
-    free(b);
+    // free(b); // segfault ?
     EXCEPTION_LANCE(Exception_fichier_lecture_dans_fichier_ouvert_en_ecriture);
   }
 
@@ -194,7 +194,7 @@ Booleen get_bit(struct bitstream *b) {
   if (b->nb_bits_dans_buffer == 0) {
     int returnCode = fread(&b->buffer, bufSize, 1, b->fichier);
     if (returnCode != 1) {
-      free(b);
+      // free(b); // segfault ?
       EXCEPTION_LANCE(Exception_fichier_lecture);
     }
     b->nb_bits_dans_buffer = bufSize * 8;
