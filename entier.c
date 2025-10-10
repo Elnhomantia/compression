@@ -44,10 +44,12 @@ static char *prefixes[] = {
     "11001", "11010", "11011", "11100", "11101", "11110", "111110", "111111"};
 
 void put_entier(struct bitstream *b, unsigned int f) {
-  if (f > 32767) {
+
+  unsigned int nb_bits = nb_bits_utile(f);
+
+  if(nb_bits >=  TAILLE(prefixes)) {
     EXIT;
   }
-  unsigned int nb_bits = nb_bits_utile(f);
   const char *prefixe = prefixes[nb_bits];
 
   put_bit_string(b, prefixe);
@@ -74,15 +76,12 @@ unsigned int get_entier(struct bitstream *b) {
 
   while (prefix_not_found) {
     prefix_buf[len++] = get_bit(b) ? '1' : '0';
-    prefix_buf[len] = '\0';
+    // prefix_buf[len] = '\0';
     for (int i = 0; i < TAILLE(prefixes); i++) {
       if (strcmp(prefix_buf, prefixes[i]) == 0) {
         nb_bits = i;
         prefix_not_found = Faux;
       }
-    }
-    if (len >= 7 && prefix_not_found) {
-      printf("%s", prefix_buf); 
     }
   }
 
@@ -117,9 +116,15 @@ unsigned int get_entier(struct bitstream *b) {
  */
 
 void put_entier_signe(struct bitstream *b, int i) {
-  Booleen inf_a_zero = (i < 0);
-  put_bit(b, inf_a_zero);
-  put_entier(b, ABS(i) - ((inf_a_zero) ? 1 : 0));
+  
+  if(i < 0){
+    put_bit(b, Vrai);
+    i = ABS(i) - 1;
+  } else {
+    put_bit(b, Faux);
+  }
+ 
+  put_entier(b, i);
   
 }
 /*
