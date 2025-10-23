@@ -1,5 +1,6 @@
 #include "bases.h"
 #include "matrice.h"
+#include <math.h>
 #include "dct.h"
 
 /*
@@ -19,14 +20,15 @@
 
 void coef_dct(Matrice *table)
 {
-
-
-
-
-
-
-
-
+	for(int j = 0; j <table->height; j++){
+		for(int i = 0; i < table->width; i++){
+			if(j == 0){
+				table->t[j][i] = 1.0 / sqrt(table->width);
+			} else {
+				table->t[j][i] = (sqrt(2.0) / sqrt(table->width)) * cos( j * M_PI * ((2.0*i + 1.0)/(2.0 * table->width)) );
+			}
+		}
+	}
 }
 
 /*
@@ -42,19 +44,22 @@ void dct(int   inverse,		/* ==0: DCT, !=0 DCT inverse */
 	 float *sortie		/* Le son après transformation */
 	 )
 {
+	Matrice *DCT = allocation_matrice_float(nbe, nbe);
+	
+	coef_dct(DCT);
 
+	if(inverse){
+		Matrice * inv_DCT = allocation_matrice_float(nbe, nbe);
+		transposition_matrice(DCT, inv_DCT);
+		liberation_matrice_float(DCT);
+		DCT = inv_DCT;
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
+	for(int j = 0; j < nbe; j++){
+		sortie[j] = 0.0;
+		for(int i = 0; i < nbe; i++){
+			sortie[j] += DCT->t[j][i] * entree[i];
+		}
+	}
 
 }
