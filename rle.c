@@ -1,6 +1,6 @@
+#include "rle.h"
 #include "bases.h"
 #include "intstream.h"
-#include "rle.h"
 
 /*
  * Avant propos sur les "intstream"
@@ -41,62 +41,52 @@
  * En perdant le moins d'information possible.
  */
 
-void compresse(struct intstream *entier, struct intstream *entier_signe
-	       , int nbe, const float *dct)
-{
+void compresse(struct intstream *entier, struct intstream *entier_signe,
+               int nbe, const float *dct) {
+  unsigned int nb_of_zeros = 0;
+  for (int i = 0; i < nbe; i++) {
+    // eprintf("%f \n", dct[i]);
+  }
 
+  for (int i = 0; i < nbe; i++) {
+    int value = roundf(dct[i]);
 
+    if (value == 0.0) {
+      nb_of_zeros++;
+    } else {
+      put_entier_intstream(entier, nb_of_zeros);
+      put_entier_intstream(entier_signe, value);
 
+      // eprintf("zero : %d nb : %d, %f \n", nb_of_zeros, value, dct[i]);
+      nb_of_zeros = 0;
+    }
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  if (nb_of_zeros > 0) {
+    put_entier_intstream(entier, nb_of_zeros);
+  }
 }
-
 /*
  * Lit le tableau de flottant qui est dans les deux "instream"
  */
 
-void decompresse(struct intstream *entier, struct intstream *entier_signe
-		 , int nbe, float *dct)
-{
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void decompresse(struct intstream *entier, struct intstream *entier_signe,
+                 int nbe, float *dct) {
+  unsigned int tete_d_ecriture = 0;
+//  eprintf("nbe : %d\n", nbe);
+  while (tete_d_ecriture < nbe) {
+    int nb_of_zero = get_entier_intstream(entier);
+    for (int j = 0; j < nb_of_zero; j++) {
+      dct[tete_d_ecriture] = 0.0;
+	 // eprintf("zero at %d\n", tete_d_ecriture);
+      tete_d_ecriture++;
+    }
+	if(tete_d_ecriture >= nbe) {
+		break;
+	}
+    int val = get_entier_intstream(entier_signe);
+    dct[tete_d_ecriture] = (float)val;
+	//eprintf("value %d at %d\n", val, tete_d_ecriture);
+    tete_d_ecriture++;
+  }
 }
