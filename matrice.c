@@ -27,11 +27,11 @@ Matrice *allocation_matrice_float(int height, int width) {
  */
 
 void liberation_matrice_float(Matrice *m) {
-  for (int i = 0; i < m->height; i++)
+  for (int i = 0; i < m->height; i++) {
     free(m->t[i]);
+  }
   free(m->t);
   free(m);
-
 }
 
 /*
@@ -49,13 +49,15 @@ void produit_matrices_float(const Matrice *a, const Matrice *b,
   assert(a->height == b->height);
   assert(a->width == resultat->width);
   assert(a->height == resultat->height);
-  for (j = 0; j < a->height; j++)
+  for (j = 0; j < a->height; j++) {
     for (i = 0; i < a->width; i++) {
       s = 0;
-      for (k = 0; k < a->width; k++)
+      for (k = 0; k < a->width; k++) {
         s += a->t[j][k] * b->t[k][i];
+      }
       resultat->t[j][i] = s;
     }
+  }
 }
 
 /*
@@ -71,8 +73,9 @@ void produit_matrice_vecteur(const Matrice *a, const float *v,
 
   for (j = 0; j < a->height; j++) {
     s = 0;
-    for (i = 0; i < a->width; i++)
+    for (i = 0; i < a->width; i++) {
       s += a->t[j][i] * v[i];
+    }
     resultat[j] = s;
   }
 }
@@ -88,9 +91,11 @@ void transposition_matrice_partielle(const Matrice *a, Matrice *resultat,
 
   assert(a->width == resultat->height);
   assert(a->height == resultat->width);
-  for (j = 0; j < height; j++)
-    for (i = 0; i < width; i++)
+  for (j = 0; j < height; j++) {
+    for (i = 0; i < width; i++) {
       resultat->t[i][j] = a->t[j][i];
+    }
+  }
 }
 
 void transposition_matrice(const Matrice *a, Matrice *resultat) {
@@ -105,8 +110,9 @@ void affiche_matrice(const Matrice *a, FILE *f) {
   int i, j;
 
   for (j = 0; j < a->height; j++) {
-    for (i = 0; i < a->width; i++)
+    for (i = 0; i < a->width; i++) {
       fprintf(f, " %8.4g", a->t[j][i]);
+    }
     fprintf(f, "\n");
   }
 }
@@ -121,16 +127,19 @@ struct image *creation_image_a_partir_de_matrice_float(const Matrice *m) {
 
   image = allocation_image(m->height, m->width);
 
-  for (j = 0; j < image->hauteur; j++)
+  for (j = 0; j < image->hauteur; j++) {
     for (i = 0; i < image->largeur; i++) {
-      if (m->t[j][i] > 255)
+      if (m->t[j][i] > 255){
         image->pixels[j][i] = 255;
-      else if (m->t[j][i] < 0)
+      }
+      else if (m->t[j][i] < 0){
         image->pixels[j][i] = 0;
-      else
+      }
+      else{
         image->pixels[j][i] = m->t[j][i];
+      }
     }
-
+  }
   return image;
 }
 

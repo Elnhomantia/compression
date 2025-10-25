@@ -55,18 +55,14 @@ void close_shannon_fano(struct shannon_fano *sf) { free(sf); }
 static int trouve_position(const struct shannon_fano *sf, int evenement) {
 
   int i = 0;
-  int pos_escape = 0;
   while (sf->nb_evenements > i) {
     if (sf->evenements[i].valeur == evenement) {
       return i;
-    } else if (sf->evenements[i].valeur == VALEUR_ESCAPE) {
-      pos_escape = i;
     }
     i++;
   }
-  return pos_escape; /* pour enlever un warning du compilateur */
+  return trouve_position(sf, VALEUR_ESCAPE);
 }
-
 /*
  * Soit le sous-tableau "evenements[position_min..position_max]"
  * Les bornes sont incluses.
@@ -98,13 +94,10 @@ static int trouve_separation(const struct shannon_fano *sf, int position_min,
   for (int i = position_min; i <= position_max; i++) {
     somme += sf->evenements[i].nb_occurrences;
     if (somme > medianne) {
-      // printf("\n OE : %d\n" ,abs(medianne - somme));
       res = (abs(medianne - somme) <=
              abs(medianne - (somme - sf->evenements[i].nb_occurrences)))
                 ? i
                 : i - 1;
-      // printf("\n OE : %d\n" ,abs(medianne - (somme -
-      // sf->evenements[i].nb_occurrences)));
       break;
     }
   }
@@ -127,18 +120,15 @@ static void encode_position(struct bitstream *bs, struct shannon_fano *sf,
   while (min != max) {
 
     separation = trouve_separation(sf, min, max);
-    // Booleen a_droite = (separation < position) ? Vrai : Faux;
+
     put_bit(bs, (separation < position));
-    
+
     if ((separation < position)) {
       min = separation + 1;
     } else {
       max = separation;
     }
-
-    // eprintf("%d %d %d\n", min, max, separation);
   }
-  // printf(" : %d encode %d\n", position, sf->evenements[position].valeur);
 }
 
 /*
@@ -153,19 +143,16 @@ static void encode_position(struct bitstream *bs, struct shannon_fano *sf,
 static void incremente_et_ordonne(struct shannon_fano *sf, int position) {
   sf->evenements[position].nb_occurrences++;
 
-  if (position > 0) {
-    while (sf->evenements[position].nb_occurrences >
+    while (position > 0 && sf->evenements[position].nb_occurrences >
            sf->evenements[position - 1].nb_occurrences) {
 
       struct evenement temp = sf->evenements[position - 1];
       sf->evenements[position - 1] = sf->evenements[position];
       sf->evenements[position] = temp;
       position--;
-      if (position == 0) {
-        return;
-      }
+    
     }
-  }
+  
 }
 
 /*
@@ -198,22 +185,16 @@ static int decode_position(struct bitstream *bs, struct shannon_fano *sf) {
   int max = sf->nb_evenements - 1;
 
   while (max != min) {
-    int separation = trouve_separation(sf, min, max );
-    int bit = get_bit(
-        bs); /* 0 = gauche (<= separation-1), 1 = droite (>= separation+1) */
-    
-      if (bit) {
-      /* On était à droite */
+    int separation = trouve_separation(sf, min, max);
+    int bit = get_bit(bs);
+
+    if (bit) {
       min = separation + 1;
     } else {
-      /* On était à gauche */
       max = separation;
     }
   }
- 
-
-  /* Quand la boucle s'arrête, min == position */
-  return min ;
+  return min;
 }
 
 /*
@@ -227,7 +208,7 @@ int get_entier_shannon_fano(struct bitstream *bs, struct shannon_fano *sf) {
   int evenement = sf->evenements[pos].valeur;
   incremente_et_ordonne(sf, pos);
 
-  if(evenement == VALEUR_ESCAPE){
+  if (evenement == VALEUR_ESCAPE) {
     evenement = get_bits(bs, sizeof(int) * 8);
     sf->evenements[sf->nb_evenements].valeur = evenement;
     sf->evenements[sf->nb_evenements].nb_occurrences = 1;
