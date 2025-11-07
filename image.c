@@ -72,8 +72,15 @@ void liberation_image(struct image *image) {
  */
 
 struct image *lecture_image(FILE *f) {
-    // char ligne[MAXLIGNE];
-    // lire_ligne(f, ligne);
+    char ligne[MAXLIGNE];
+    lire_ligne(f, ligne);
+    if(ligne != "P5")
+    {
+      //Erreur
+    }
+    lire_ligne(f, ligne);
+    int largeur = atoi(strtok(ligne, " "));
+    int hauteur = atoi(strtok(ligne, " "));
     // lire_ligne(f, ligne);
 
     // unsigned int line_size = strlen(ligne);
