@@ -45,8 +45,9 @@ void dct(int   inverse,		/* ==0: DCT, !=0 DCT inverse */
 	 float *sortie		/* Le son après transformation */
 	 )
 {
-	static Matrice *DCT = NULL;
-	allocation_matrice_float(nbe, nbe);
+	//Voir mettre static mais la fonction d'allocation n'est pas statique
+	Matrice *DCT = allocation_matrice_float(nbe, nbe);
+	
 	
 	coef_dct(DCT);
 

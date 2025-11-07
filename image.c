@@ -1,6 +1,5 @@
 #include "image.h"
 #include "bit.h"
-#include <cstring>
 
 /*
  * Lecture d'une ligne du fichier.
@@ -86,7 +85,7 @@ struct image *lecture_image(FILE *f) {
     // char nb2[MAXLIGNE];
 
 
-//   return 0; /* pour enlever un warning du compilateur */
+  return 0; /* pour enlever un warning du compilateur */
 }
 
 /*
