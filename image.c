@@ -1,5 +1,6 @@
 #include "image.h"
 #include "bit.h"
+#include <string.h>
 
 /*
  * Lecture d'une ligne du fichier.
@@ -74,29 +75,48 @@ void liberation_image(struct image *image) {
 struct image *lecture_image(FILE *f) {
     char ligne[MAXLIGNE];
     lire_ligne(f, ligne);
-    if(ligne != "P5")
+    if(strcmp( ligne, "P5\n") != 0)
     {
       //Erreur
     }
     lire_ligne(f, ligne);
+
     int largeur = atoi(strtok(ligne, " "));
-    int hauteur = atoi(strtok(ligne, " "));
-    // lire_ligne(f, ligne);
+    int hauteur = atoi(strtok(NULL, " "));
+   // eprintf("%d, %d", largeur, hauteur);
+    lire_ligne(f, ligne);
+    
 
-    // unsigned int line_size = strlen(ligne);
+    struct image *im = allocation_image(hauteur, largeur);
 
-    // for(int i = line_size - 1; i >= 0; )
+    for(int i = 0; i < hauteur; i++)
+    {
+      for(int j = 0; j < largeur; j++)
+      {
+         fread(&im->pixels[i][j], sizeof(**im->pixels), 1, f);
+      }
+    }
 
-    // char nb1[MAXLIGNE];
 
-    // char nb2[MAXLIGNE];
-
-
-  return 0; /* pour enlever un warning du compilateur */
+  return im; /* pour enlever un warning du compilateur */
 }
 
 /*
  * Écriture de l'image (toujours au format PGM)
  */
 
-void ecriture_image(FILE *f, const struct image *image) {}
+void ecriture_image(FILE *f, const struct image *image) {
+  fprintf(f, "P5\n");
+  fprintf(f, "%d %d\n", image->largeur, image->hauteur);
+  fprintf(f, "255\n");
+
+  for(int i = 0; i < image->hauteur; i++)
+  {
+    for(int j = 0; j < image->largeur; j++)
+    {
+       fwrite(&image->pixels[i][j], sizeof(**image->pixels), 1, f);
+    }
+  }
+
+
+}
