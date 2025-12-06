@@ -21,30 +21,21 @@
  * A B C D E F       (A+B)/2 (C+D)/2 (E+F)/2 (A-B)/2 (C-D)/2 (E-F)/2
  */
 
-void ondelette_1d(const float *entree, float *sortie, int nbe)
-{
+void ondelette_1d(const float *entree, float *sortie, int nbe) {
 
   int milieu = nbe / 2 + (nbe & 1);
   // eprintf("%d SCROGNEUGNEU\n", nbe);
-  if (nbe == 1)
-  {
+  if (nbe == 1) {
     *sortie = *entree;
-  }
-  else
-  {
-    for (int i = 0; i < nbe; i++)
-    {
-      if (i < nbe / 2)
-      {
+  } else {
+    for (int i = 0; i < nbe; i++) {
+      if (i < nbe / 2) {
         sortie[i] = (entree[i * 2] + entree[i * 2 + 1]) / 2.;
-      }
-      else if (i == nbe / 2 && nbe & 1)
-      {
+      } else if (i == nbe / 2 && nbe & 1) {
         sortie[i] = entree[nbe - 1];
-      }
-      else
-      {
-        sortie[i] = (entree[(i - milieu) * 2] - entree[(i - milieu) * 2 + 1]) / 2.;
+      } else {
+        sortie[i] =
+            (entree[(i - milieu) * 2] - entree[(i - milieu) * 2 + 1]) / 2.;
       }
     }
   }
@@ -100,45 +91,34 @@ void ondelette_1d(const float *entree, float *sortie, int nbe)
  *
  */
 
-void ondelette_2d(Matrice *image)
-{
+void ondelette_2d(Matrice *image) {
   int hau = image->height;
   int lar = image->width;
 
-  /* buffers temporaires : on alloue à la taille maximale et on réutilise */
-  Matrice *tmp1 = allocation_matrice_float(image->height, image->width); /* hau x lar */
-  Matrice *tmp2 = allocation_matrice_float(image->width, image->height); /* lar x hau */
-  Matrice *tmp3 = allocation_matrice_float(image->width, image->height); /* lar x hau (résultat deuxième passe) */
+  Matrice *tmp1 = allocation_matrice_float(image->height, image->width);
+  Matrice *tmp2 = allocation_matrice_float(image->width, image->height);
+  Matrice *tmp3 = allocation_matrice_float(image->width, image->height);
 
-  /* Tant que la zone basse fréquence n'est pas réduite à 1x1 */
-  while (hau != 1 || lar != 1)
-  {
-    /* 1) passe horizontale (sur les 'lar' colonnes) pour les 'hau' premières lignes */
-    for (int j = 0; j < hau; j++)
-    {
+  while (hau != 1 || lar != 1) {
+
+    for (int j = 0; j < hau; j++) {
       ondelette_1d(image->t[j], tmp1->t[j], lar);
     }
 
-    /* 2) transposition de tmp1 (hau x lar) -> tmp2 (lar x hau) */
-    for (int j = 0; j < hau; j++)
-      for (int i = 0; i < lar; i++)
-        tmp2->t[i][j] = tmp1->t[j][i];
+    transposition_matrice_partielle(tmp1, tmp2, hau, lar);
 
-    /* 3) passe horizontale sur tmp2 (qui correspond à la passe verticale de l'image originale) */
-    for (int j = 0; j < lar; j++)
-    {
+    for (int j = 0; j < lar; j++) {
       ondelette_1d(tmp2->t[j], tmp3->t[j], hau);
     }
 
-    /* 4) retransposition du résultat (tmp3 : lar x hau) -> image (hau x lar) */
-    for (int j = 0; j < hau; j++)
-      for (int i = 0; i < lar; i++)
-        image->t[j][i] = tmp3->t[i][j];
+    transposition_matrice_partielle(tmp3, image, lar, hau);
 
-    /* on ne travaille plus que sur la moitié basse-fréquence */
     hau = (hau + 1) / 2;
     lar = (lar + 1) / 2;
   }
+  liberation_matrice_float(tmp1);
+  liberation_matrice_float(tmp2);
+  liberation_matrice_float(tmp3);
 }
 
 /*
@@ -149,8 +129,7 @@ void ondelette_2d(Matrice *image)
  * Une qualité de 1 indique que l'on a pas de pertes.
  */
 
-void quantif_ondelette(Matrice *image, float qualite)
-{
+void quantif_ondelette(Matrice *image, float qualite) {
   int hau = image->height;
   int lar = image->width;
   float q = qualite;
@@ -160,8 +139,7 @@ void quantif_ondelette(Matrice *image, float qualite)
 
   /* Pour chaque niveau, quantifier les coefficients hors de la zone
      basse-fréquence (comme dans codage_ondelette) puis réduire la zone. */
-  while (hau != 1 || lar != 1)
-  {
+  while (hau != 1 || lar != 1) {
     int mid_h = (hau + 1) / 2;
     int mid_l = (lar + 1) / 2;
 
@@ -170,7 +148,8 @@ void quantif_ondelette(Matrice *image, float qualite)
         if (j >= mid_h || i >= mid_l)
           image->t[j][i] = roundf(image->t[j][i] / q);
 
-    /* réduire la qualité pour la prochaine octave (division par 8), en restant >= 1 */
+    /* réduire la qualité pour la prochaine octave (division par 8), en restant
+     * >= 1 */
     q /= 8.0f;
     if (q < 1.0f)
       q = 1.0f;
@@ -190,8 +169,7 @@ void quantif_ondelette(Matrice *image, float qualite)
  * un parcours de Péano sur chacun des blocs.
  */
 
-void codage_ondelette(Matrice *image, FILE *f)
-{
+void codage_ondelette(Matrice *image, FILE *f) {
   int j, i;
   float *t, *pt;
   struct intstream *entier, *entier_signe;
@@ -208,8 +186,7 @@ void codage_ondelette(Matrice *image, FILE *f)
   ALLOUER(t, hau * lar);
   pt = t;
 
-  while (hau != 1 || lar != 1)
-  {
+  while (hau != 1 || lar != 1) {
     for (j = 0; j < hau; j++)
       for (i = 0; i < lar; i++)
         if (j >= (hau + 1) / 2 || i >= (lar + 1) / 2)
@@ -242,8 +219,7 @@ void codage_ondelette(Matrice *image, FILE *f)
 */
 
 void ondelette_1d_inverse(const float *entree, float *sortie, int nbe) {
-  if (nbe == 1)
-  {
+  if (nbe == 1) {
     *sortie = *entree;
     return;
   }
@@ -252,8 +228,7 @@ void ondelette_1d_inverse(const float *entree, float *sortie, int nbe) {
   int milieu = mid + (nbe & 1);
 
   /* pour chaque paire moyenne/différence */
-  for (int k = 0; k < mid; k++)
-  {
+  for (int k = 0; k < mid; k++) {
     float moy = entree[k];
     float diff = entree[milieu + k];
     sortie[2 * k] = moy + diff;
@@ -266,48 +241,41 @@ void ondelette_1d_inverse(const float *entree, float *sortie, int nbe) {
 }
 
 void ondelette_2d_inverse(Matrice *image) {
-   int full_h = image->height;
-  int full_w = image->width;
+  int hauteur = image->height;
+  int largeur = image->width;
+  // Calculer les dimensions de chaque niveau (de l’original vers 1×1)
+  int dimsH[32], dimsW[32];
+  int niveau = 0;
+  dimsH[0] = hauteur;
+  dimsW[0] = largeur;
+  while (dimsH[niveau] > 1 || dimsW[niveau] > 1) {
+    dimsH[niveau + 1] = (dimsH[niveau] + 1) / 2;
+    dimsW[niveau + 1] = (dimsW[niveau] + 1) / 2;
+    niveau++;
+  }
+  // Allocation des matrices intermédiaires (taille max)
+  Matrice *tmp1 = allocation_matrice_float(hauteur, largeur);
+  Matrice *tmp2 = allocation_matrice_float(largeur, hauteur);
+  Matrice *tmp3 = allocation_matrice_float(largeur, hauteur);
 
-  /* buffers temporaires : alloués à la taille maximale */
-  Matrice *tmp1 = allocation_matrice_float(full_h, full_w); /* full_h x full_w */
-  Matrice *tmp2 = allocation_matrice_float(full_w, full_h); /* full_w x full_h */
-  Matrice *tmp3 = allocation_matrice_float(full_w, full_h); /* full_w x full_h */
-
-  int hau = 1;
-  int lar = 1;
-
-  /* On reconstruit les niveaux du plus bas (1x1) au plus grand (full_h x full_w) */
-  while (hau != full_h || lar != full_w)
-  {
-    int next_h = hau * 2;
-    int next_l = lar * 2;
-    if (next_h > full_h)
-      next_h = full_h;
-    if (next_l > full_w)
-      next_l = full_w;
-
-    /* 4) recharger tmp3 = transpose de la zone image[0..next_h-1][0..next_l-1] */
-    for (int j = 0; j < next_h; j++)
-      for (int i = 0; i < next_l; i++)
-        tmp3->t[i][j] = image->t[j][i]; /* tmp3 size: next_l x next_h (stored in larger buffer) */
-
-    /* 3) inverse de la passe verticale : pour chaque ligne de tmp3 (il y en a next_l), appliquer ondelette_1d_inverse de longueur next_h pour obtenir tmp2 */
-    for (int j = 0; j < next_l; j++)
-      ondelette_1d_inverse(tmp3->t[j], tmp2->t[j], next_h); /* tmp2 rows of length next_h */
-
-    /* 2) retranspose tmp2 (next_l x next_h) -> tmp1 (next_h x next_l) */
-    for (int j = 0; j < next_h; j++)
-      for (int i = 0; i < next_l; i++)
-        tmp1->t[j][i] = tmp2->t[i][j];
-
-    /* 1) inverse de la passe horizontale : pour chaque des next_h lignes, appliquer ondelette_1d_inverse de longueur next_l pour obtenir image->t[j][0..next_l-1] */
-    for (int j = 0; j < next_h; j++)
-      ondelette_1d_inverse(tmp1->t[j], image->t[j], next_l);
-
-    /* passer au niveau suivant */
-    hau = next_h;
-    lar = next_l;
+  // Inversion niveau par niveau (du plus petit vers l’original)
+  for (int lvl = niveau - 1; lvl >= 0; lvl--) {
+    int bigH = dimsH[lvl];
+    int bigW = dimsW[lvl];
+    // 1) Transposer la sous-matrice courante de image -> tmp3 (bigH x bigW ->
+    // bigW x bigH)
+    transposition_matrice_partielle(image, tmp3, bigH, bigW);
+    // 2) Inverse 1D sur chaque "ligne" de tmp3 (qui sont en fait les colonnes
+    // d'origine)
+    for (int j = 0; j < bigW; j++) {
+      ondelette_1d_inverse(tmp3->t[j], tmp2->t[j], bigH);
+    }
+    // 3) Transposer tmp2 -> tmp1 (bigW x bigH -> bigH x bigW)
+    transposition_matrice_partielle(tmp2, tmp1, bigW, bigH);
+    // 4) Inverse 1D sur chaque ligne de tmp1 (traitement des lignes d'origine)
+    for (int i = 0; i < bigH; i++) {
+      ondelette_1d_inverse(tmp1->t[i], image->t[i], bigW);
+    }
   }
 
   liberation_matrice_float(tmp1);
@@ -315,10 +283,41 @@ void ondelette_2d_inverse(Matrice *image) {
   liberation_matrice_float(tmp3);
 }
 
-void dequantif_ondelette(Matrice *image, float qualite) {}
+void dequantif_ondelette(Matrice *image, float qualite) {
+  int hau = image->height;
+  int lar = image->width;
+  float q = qualite;
 
-void decodage_ondelette(Matrice *image, FILE *f)
-{
+  if (q < 1.0f)
+    q = 1.0f;
+
+  /* Pour chaque niveau, restaurer (multiplier) les coefficients hors de la
+     zone basse-fréquence (comme dans quantif_ondelette) puis réduire la zone.
+   */
+  while (hau != 1 || lar != 1) {
+    int mid_h = (hau + 1) / 2;
+    int mid_l = (lar + 1) / 2;
+
+    for (int j = 0; j < hau; j++)
+      for (int i = 0; i < lar; i++)
+        if (j >= mid_h || i >= mid_l)
+          image->t[j][i] = image->t[j][i] * q;
+
+    /* réduire la qualité pour la prochaine octave (division par 8), en restant
+     * >= 1 */
+    q /= 8.0f;
+    if (q < 1.0f)
+      q = 1.0f;
+
+    hau = mid_h;
+    lar = mid_l;
+  }
+
+  /* restaurer la composante basse-fréquence finale */
+  image->t[0][0] = image->t[0][0] * q;
+}
+
+void decodage_ondelette(Matrice *image, FILE *f) {
   int j, i;
   float *t, *pt;
   struct intstream *entier, *entier_signe;
@@ -345,8 +344,7 @@ void decodage_ondelette(Matrice *image, FILE *f)
    * Met dans la matrice
    */
   pt = t;
-  while (hauteur != 1 || largeur != 1)
-  {
+  while (hauteur != 1 || largeur != 1) {
     for (j = 0; j < hauteur; j++)
       for (i = 0; i < largeur; i++)
         if (j >= (hauteur + 1) / 2 || i >= (largeur + 1) / 2)
@@ -371,8 +369,7 @@ ondelette <DONNEES/bat710.pgm 1 >xxx && ls -ls xxx && ondelette_inv <xxx | xv -
 
  */
 
-void ondelette_encode_image(float qualite)
-{
+void ondelette_encode_image(float qualite) {
   struct image *image;
   Matrice *im;
   int i, j;
@@ -400,8 +397,7 @@ void ondelette_encode_image(float qualite)
   //  affiche_matrice_float(im, image->hauteur, image->largeur) ;
 }
 
-void ondelette_decode_image()
-{
+void ondelette_decode_image() {
   int hauteur, largeur;
   float qualite;
   struct image *image;
