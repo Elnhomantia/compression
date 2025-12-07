@@ -24,7 +24,6 @@
 void ondelette_1d(const float *entree, float *sortie, int nbe) {
 
   int milieu = nbe / 2 + (nbe & 1);
-  // eprintf("%d SCROGNEUGNEU\n", nbe);
   if (nbe == 1) {
     *sortie = *entree;
   } else {
@@ -92,29 +91,29 @@ void ondelette_1d(const float *entree, float *sortie, int nbe) {
  */
 
 void ondelette_2d(Matrice *image) {
-  int hau = image->height;
-  int lar = image->width;
+  int height = image->height;
+  int width = image->width;
 
   Matrice *tmp1 = allocation_matrice_float(image->height, image->width);
   Matrice *tmp2 = allocation_matrice_float(image->width, image->height);
   Matrice *tmp3 = allocation_matrice_float(image->width, image->height);
 
-  while (hau != 1 || lar != 1) {
+  while (height != 1 || width != 1) {
 
-    for (int j = 0; j < hau; j++) {
-      ondelette_1d(image->t[j], tmp1->t[j], lar);
+    for (int j = 0; j < height; j++) {
+      ondelette_1d(image->t[j], tmp1->t[j], width);
     }
 
-    transposition_matrice_partielle(tmp1, tmp2, hau, lar);
+    transposition_matrice_partielle(tmp1, tmp2, height, width);
 
-    for (int j = 0; j < lar; j++) {
-      ondelette_1d(tmp2->t[j], tmp3->t[j], hau);
+    for (int j = 0; j < width; j++) {
+      ondelette_1d(tmp2->t[j], tmp3->t[j], height);
     }
 
-    transposition_matrice_partielle(tmp3, image, lar, hau);
+    transposition_matrice_partielle(tmp3, image, width, height);
 
-    hau = (hau + 1) / 2;
-    lar = (lar + 1) / 2;
+    height = (height + 1) / 2;
+    width = (width + 1) / 2;
   }
   liberation_matrice_float(tmp1);
   liberation_matrice_float(tmp2);
@@ -130,35 +129,34 @@ void ondelette_2d(Matrice *image) {
  */
 
 void quantif_ondelette(Matrice *image, float qualite) {
-  int hau = image->height;
-  int lar = image->width;
+  int height = image->height;
+  int width = image->width;
   float q = qualite;
 
   if (q < 1.0f)
     q = 1.0f;
 
-  /* Pour chaque niveau, quantifier les coefficients hors de la zone
-     basse-fréquence (comme dans codage_ondelette) puis réduire la zone. */
-  while (hau != 1 || lar != 1) {
-    int mid_h = (hau + 1) / 2;
-    int mid_l = (lar + 1) / 2;
+  while (height != 1 || width != 1) {
+    int mid_h = (height + 1) / 2;
+    int mid_l = (width + 1) / 2;
 
-    for (int j = 0; j < hau; j++)
-      for (int i = 0; i < lar; i++)
-        if (j >= mid_h || i >= mid_l)
+    for (int j = 0; j < height; j++) {
+      for (int i = 0; i < width; i++) {
+        if (j >= mid_h || i >= mid_l) {
           image->t[j][i] = roundf(image->t[j][i] / q);
+        }
+      }
+    }
 
-    /* réduire la qualité pour la prochaine octave (division par 8), en restant
-     * >= 1 */
     q /= 8.0f;
-    if (q < 1.0f)
+    if (q < 1.0f) {
       q = 1.0f;
+    }
 
-    hau = mid_h;
-    lar = mid_l;
+    height = mid_h;
+    width = mid_l;
   }
 
-  /* quantifier la composante basse-fréquence finale */
   image->t[0][0] = roundf(image->t[0][0] / q);
 }
 
@@ -227,7 +225,6 @@ void ondelette_1d_inverse(const float *entree, float *sortie, int nbe) {
   int mid = nbe / 2;
   int milieu = mid + (nbe & 1);
 
-  /* pour chaque paire moyenne/différence */
   for (int k = 0; k < mid; k++) {
     float moy = entree[k];
     float diff = entree[milieu + k];
@@ -235,44 +232,39 @@ void ondelette_1d_inverse(const float *entree, float *sortie, int nbe) {
     sortie[2 * k + 1] = moy - diff;
   }
 
-  /* si nombre impair, restaurer le dernier élément tel quel */
-  if (nbe & 1)
+  if (nbe & 1) {
     sortie[nbe - 1] = entree[mid];
+  }
 }
 
 void ondelette_2d_inverse(Matrice *image) {
-  int hauteur = image->height;
-  int largeur = image->width;
-  // Calculer les dimensions de chaque niveau (de l’original vers 1×1)
+  int height = image->height;
+  int width = image->width;
   int dimsH[32], dimsW[32];
   int niveau = 0;
-  dimsH[0] = hauteur;
-  dimsW[0] = largeur;
+  dimsH[0] = height;
+  dimsW[0] = width;
   while (dimsH[niveau] > 1 || dimsW[niveau] > 1) {
     dimsH[niveau + 1] = (dimsH[niveau] + 1) / 2;
     dimsW[niveau + 1] = (dimsW[niveau] + 1) / 2;
     niveau++;
   }
-  // Allocation des matrices intermédiaires (taille max)
-  Matrice *tmp1 = allocation_matrice_float(hauteur, largeur);
-  Matrice *tmp2 = allocation_matrice_float(largeur, hauteur);
-  Matrice *tmp3 = allocation_matrice_float(largeur, hauteur);
 
-  // Inversion niveau par niveau (du plus petit vers l’original)
+  Matrice *tmp1 = allocation_matrice_float(height, width);
+  Matrice *tmp2 = allocation_matrice_float(width, height);
+  Matrice *tmp3 = allocation_matrice_float(width, height);
+
+
   for (int lvl = niveau - 1; lvl >= 0; lvl--) {
     int bigH = dimsH[lvl];
     int bigW = dimsW[lvl];
-    // 1) Transposer la sous-matrice courante de image -> tmp3 (bigH x bigW ->
-    // bigW x bigH)
+
     transposition_matrice_partielle(image, tmp3, bigH, bigW);
-    // 2) Inverse 1D sur chaque "ligne" de tmp3 (qui sont en fait les colonnes
-    // d'origine)
+
     for (int j = 0; j < bigW; j++) {
       ondelette_1d_inverse(tmp3->t[j], tmp2->t[j], bigH);
     }
-    // 3) Transposer tmp2 -> tmp1 (bigW x bigH -> bigH x bigW)
     transposition_matrice_partielle(tmp2, tmp1, bigW, bigH);
-    // 4) Inverse 1D sur chaque ligne de tmp1 (traitement des lignes d'origine)
     for (int i = 0; i < bigH; i++) {
       ondelette_1d_inverse(tmp1->t[i], image->t[i], bigW);
     }
@@ -284,33 +276,35 @@ void ondelette_2d_inverse(Matrice *image) {
 }
 
 void dequantif_ondelette(Matrice *image, float qualite) {
-  int hau = image->height;
-  int lar = image->width;
+  int height = image->height;
+  int width = image->width;
   float q = qualite;
 
   if (q < 1.0f)
     q = 1.0f;
 
-  /* Pour chaque niveau, restaurer (multiplier) les coefficients hors de la
-     zone basse-fréquence (comme dans quantif_ondelette) puis réduire la zone.
-   */
-  while (hau != 1 || lar != 1) {
-    int mid_h = (hau + 1) / 2;
-    int mid_l = (lar + 1) / 2;
 
-    for (int j = 0; j < hau; j++)
-      for (int i = 0; i < lar; i++)
-        if (j >= mid_h || i >= mid_l)
+  while (height != 1 || width != 1) {
+    int mid_h = (height + 1) / 2;
+    int mid_l = (width + 1) / 2;
+
+    for (int j = 0; j < height; j++) {
+      for (int i = 0; i < width; i++) {
+        if (j >= mid_h || i >= mid_l) {
           image->t[j][i] = image->t[j][i] * q;
+        }
+      }
+    }
 
     /* réduire la qualité pour la prochaine octave (division par 8), en restant
      * >= 1 */
     q /= 8.0f;
-    if (q < 1.0f)
+    if (q < 1.0f){
       q = 1.0f;
+    }
 
-    hau = mid_h;
-    lar = mid_l;
+    height = mid_h;
+    width = mid_l;
   }
 
   /* restaurer la composante basse-fréquence finale */
